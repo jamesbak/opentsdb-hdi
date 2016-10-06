@@ -31,7 +31,7 @@ if [ "$(hostname -i)" == "$head_ip" ] ; then
     chmod 744 /tmp/create-opentsdb-ambari-services.sh
     mkdir /var/log/opentsdb
     echo "Logging background activity to /var/log/opentsdb/create-ambari-services.out & /var/log/opentsdb/create-ambari-services.err"
-    nohup /tmp/create-opentsdb-ambari-services.sh $user $password $cluster >/var/log/opentsdb/create-ambari-services.out 2>/var/log/opentsdb/create-ambari-services.err
+    nohup /tmp/create-opentsdb-ambari-services.sh $user $password $cluster >/var/log/opentsdb/create-ambari-services.out 2>/var/log/opentsdb/create-ambari-services.err &
 else
 
     echo "Node is not currently active head node"
