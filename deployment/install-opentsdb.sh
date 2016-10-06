@@ -1,7 +1,7 @@
 #!/bin/bash          
 
-user=admin
-password=P0rsche911!
+user=$1
+password=$2
 
 apt-get install jq
 wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -O /usr/bin/jq
@@ -11,6 +11,7 @@ stack_name=$(curl -u $user:$password http://headnodehost:8080/api/v1/clusters/$c
 stack_version=$(curl -u $user:$password http://headnodehost:8080/api/v1/clusters/$cluster/stack_versions | jq -r '.items[0].ClusterStackVersions.version')
 
 cd /var/lib/ambari-server/resources/stacks/$stack_name/$stack_version/services
+wget "https://github.com/jamesbak/opentsdb-hdi/files/514763/OPENTSDB.tar.gz" -O /tmp/OPENTSDB.tar.gz
 tar -xvf /tmp/OPENTSDB.tar.gz
 chmod -R 644 OPENTSDB
 sed -i "s/\(agent.auto.cache.update=\).*/\1true/" /etc/ambari-server/conf/ambari.properties
@@ -76,6 +77,7 @@ else
 
     echo "Node is not currently active head node"
 fi
+echo "OpenTSDB has been installed and TSD components have been deployed to all HBase region servers"
 
 
 

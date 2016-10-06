@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from resource_management import *
+import os, glob
 
 # server configurations
 config = Script.get_config()
@@ -11,5 +12,4 @@ zk_basedir = config['configurations']['hbase-site']['zookeeper.znode.parent']
 opentsdb_site = config['configurations']['opentsdb-site']
 tsd_port = config['configurations']['opentsdb-site']['tsd.network.port']
 tsd_hosts = config['clusterHostInfo']['opentsdb_tsd_hosts']
-
-print tsd_hosts
+cert_name = os.path.splitext(os.path.basename(glob.glob("/var/lib/waagent/*.prv")[0]))[0]

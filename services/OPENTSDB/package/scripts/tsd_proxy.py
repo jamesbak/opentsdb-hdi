@@ -1,31 +1,27 @@
 #!/usr/bin/env python
 
-import sys, os, pwd, signal, time
+import sys, os, pwd, signal, time, glob
 from resource_management import *
 
 class TSDProxy(Script):
   def install(self, env):
     # Install packages listed in metainfo.xml
     self.install_packages(env)
-    import params
-
-    Logger.info("TSDProxy - Starting installation.")
-    Execute('wget https://repo.varnish-cache.org/pkg/5.0.0/varnish_5.0.0-1_amd64.deb -O /tmp/varnish_5.0.0-1_amd64.deb')
-    Execute('dpkg -i /tmp/varnish_5.0.0-1_amd64.deb')
-    # Installation starts the service - stop it now
-    Execute('service varnish stop')
-    Logger.info("TSDProxy - Installation complete.")
+    Logger.info("TSDProxy - Nothing to install. All components installed by HDInsight.")
 
   def configure(self, env):
     import params
     env.set_params(params)
 
     Logger.info("TSDProxy - Starting configuration.")
-    File("/etc/varnish/default.vcl",
-         content = Template("default.vcl.j2"))
-    File("/etc/default/varnish",
-         content = StaticFile("varnish"),
-         mode = 0644)
+    # The standard HDI installation leaves nginx.conf with invalid TLS certs (they use placeholders). We
+    # need to replace the placeholder with real cert info (loaded via params)
+    cert_placeholder_replace = ('sed', '-i', 's|ssl_certificate /var/lib/waagent/.*.crt|ssl_certificate /var/lib/waagent/{0}.crt|'.format(params.cert_name), '/etc/nginx/nginx.conf')
+    Execute(cert_placeholder_replace)
+    cert_placeholder_replace = ('sed', '-i', 's|ssl_certificate_key /var/lib/waagent/.*.prv|ssl_certificate_key /var/lib/waagent/{0}.prv|'.format(params.cert_name), '/etc/nginx/nginx.conf')
+    Execute(cert_placeholder_replace)
+    File("/etc/nginx/sites-available/default",
+         content = Template("nginx-sites-available-default.j2"))
     Logger.info("TSDProxy - Configuration completed.")
 
   def start(self, env):
@@ -33,16 +29,16 @@ class TSDProxy(Script):
     self.configure(env)
 
     Logger.info("TSDProxy - Starting service.")
-    Execute('service varnish start')
+    Execute('service nginx start')
     Logger.info("TSDProxy - Service is running.")
 
   def stop(self, env):
     Logger.info("TSDProxy - Stopping service.")
-    Execute('service varnish stop')
+    Execute('service nginx stop')
     Logger.info("TSDProxy - Service is stopped.")
 
   def status(self, env):
-    check_process_status('/var/run/varnishd.pid')
+    check_process_status('/var/run/nginx.pid')
 
 if __name__ == "__main__":
   TSDProxy().execute()
