@@ -157,7 +157,7 @@
               "scriptActions": [
                 {
                   "name": "install-opentsdb",
-                  "uri": "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/0.2/deployment/install-opentsdb.sh",
+                  "uri": "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/v0.2/deployment/install-opentsdb.sh",
                   "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'))]",
                   "isHeadNode": true
                 }
@@ -203,7 +203,7 @@
         "installScriptActions": [
           {
             "name": "install-opentsdb-proxy",
-            "uri": "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/0.2/deployment/deploy-external-proxy.sh",
+            "uri": "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/v0.2/deployment/deploy-external-proxy.sh",
             "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'))]",
             "roles": [
               "edgenode"
