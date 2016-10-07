@@ -83,13 +83,6 @@
         "Standard_D3_V2",
         "Standard_D4_V2"
       ]
-    },
-    "edgeNodePort": {
-      "type": "int",
-      "defaultValue": 4242,
-      "metadata": {
-        "description": "The port number that the external OpenTSDB proxy is listening on."
-      }
     }
   },
   "variables": {
@@ -207,7 +200,7 @@
           {
             "name": "install-opentsdb-proxy",
             "uri": "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/v0.3/deployment/deploy-external-proxy.sh",
-            "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'))]",
+            "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'), ' tsd')]",
             "roles": [
               "edgenode"
             ]
@@ -217,7 +210,7 @@
         "httpsEndpoints": [
           {
             "subDomainSuffix": "tsd",
-            "destinationPort": "[parameters('edgeNodePort')]",
+            "destinationPort": 4243,
             "accessModes": [
               "webpage"
             ]

@@ -27,7 +27,41 @@ cat OPENTSDB/metrics.json | jq -r '.OPENTSDB_PROXY.Component[0].metrics.default[
 
 # OPTIONAL - Install IFrame View to point to our edge node so that we get the OpenTSDB GUI hosted in Ambari Web App
 if [ ! -z "$proxy_domain_suffix" ]; then
-    echo "$(date +%T) Building IFrame View to point to edge node at address: "    
+    edge_uri="https://$cluster-$proxy_domain_suffix.apps.azurehdinsight.net"
+    echo "$(date +%T) Building IFrame View to point to edge node at address: $edge_uri"
+    mkdir /tmp/opentsdb-view
+    mkdir /tmp/opentsdb-view/jar
+    mkdir /tmp/opentsdb-view/jar/META-INF
+    cd /tmp/opentsdb-view/jar
+    rm /tmp/opentsdb-view/opentsdb-view.jar
+    # The order the we add things to the zip/jar is significant - manifest information must be first
+    echo 'Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: root
+Build-Jdk: 1.7.0_111
+
+' > ./META-INF/MANIFEST.MF
+    zip -r /tmp/opentsdb-view/opentsdb-view.jar META-INF 
+    echo '
+<html>
+  <body>
+    <iframe src="'$edge_uri'" style="border: 0; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%">
+  </body>
+</html>
+' > index.html
+    echo '
+<view>
+  <name>OPENTSDB_VIEW</name>
+  <label>OpenTSDB View</label>
+  <version>1.0.0</version>
+  <instance>
+    <name>INSTANCE_1</name>
+  </instance>
+</view>
+' > view.xml
+    zip -r /tmp/opentsdb-view/opentsdb-view.jar *
+    cp /tmp/opentsdb-view/opentsdb-view.jar /var/lib/ambari-server/resources/views
 fi
 
 # Only perform the remainder on the active head nodes (as defined by headnodehost)
