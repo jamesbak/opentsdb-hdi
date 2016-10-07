@@ -55,7 +55,10 @@
         "3.3",
         "3.4",
         "3.5"
-      ]
+      ],
+      "metadata": {
+        "description": "Select the HDInsight version that you wish to deploy."
+      }
     },
     "clusterWorkerNodeCount": {
       "type": "int",
