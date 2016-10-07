@@ -17,6 +17,7 @@
     },
     "clusterLoginPassword": {
       "type": "securestring",
+      "minLength": 10,
       "metadata": {
         "description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
       }
@@ -30,6 +31,7 @@
     },
     "sshPassword": {
       "type": "securestring",
+      "minLength": 10,
       "metadata": {
         "description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
       }
@@ -83,6 +85,13 @@
         "Standard_D3_V2",
         "Standard_D4_V2"
       ]
+    },
+    "tsdPortNumber": {
+      "type": "int",
+      "defaultValue": 4242,
+      "metadata": {
+        "description": "The port number that the TSD services should listen to requests on."
+      }
     }
   },
   "variables": {
@@ -154,7 +163,7 @@
                 {
                   "name": "install-opentsdb",
                   "uri": "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/v0.3/deployment/install-opentsdb.sh",
-                  "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'))]",
+                  "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'), ' tsd ', parameters('tsdPortNumber'))]",
                   "isHeadNode": true
                 }
               ]
@@ -200,7 +209,7 @@
           {
             "name": "install-opentsdb-proxy",
             "uri": "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/v0.3/deployment/deploy-external-proxy.sh",
-            "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'), ' tsd')]",
+            "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'))]",
             "roles": [
               "edgenode"
             ]
@@ -210,7 +219,7 @@
         "httpsEndpoints": [
           {
             "subDomainSuffix": "tsd",
-            "destinationPort": 4243,
+            "destinationPort": "[parameters('tsdPortNumber')]",
             "accessModes": [
               "webpage"
             ]
