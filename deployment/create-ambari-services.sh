@@ -6,6 +6,7 @@ user=$1
 password=$2
 cluster=$3
 is_active_headnode=$4
+proxy_domain_suffix=$5
 
 # Given that this script is running detached, we need to wait for a bit before restarting Ambari. Rrestarting during the
 # execution of our parent script causes the Ambari task to fail, thus failing the ARM deployment.
