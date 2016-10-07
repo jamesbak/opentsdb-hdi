@@ -48,7 +48,8 @@ install_id=$(curl -u $user:$password -H "X-Requested-By:ambari" -X PUT -d '{"Req
 echo "Install request id is: $install_id"
 percent_complete=0
 while [ $percent_complete -lt 100 ]; do
-    percent_complete=$(curl -u $user:$password -H "X-Requested-By:ambari" "http://headnodehost:8080/api/v1/clusters/$cluster/requests/$install_id" | jq -r '.Requests.progress_percent')
+    complete=$(curl -u $user:$password -H "X-Requested-By:ambari" "http://headnodehost:8080/api/v1/clusters/$cluster/requests/$install_id" | jq -r '.Requests.progress_percent')
+    percent_complete=$(printf "%.0f" $complete)
     echo $percent_complete
     sleep 3s
 done
