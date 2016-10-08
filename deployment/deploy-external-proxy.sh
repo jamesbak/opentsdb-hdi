@@ -11,18 +11,10 @@ cluster=$(curl -u $user:$password http://headnodehost:8080/api/v1/clusters | jq 
 edge_hostname=$(hostname -f)
 echo "$(date +%T) Cluster: $cluster, Host: $edge_hostname" 
 curl -u $user:$password -H "X-Requested-By:ambari" -X POST "http://headnodehost:8080/api/v1/clusters/$cluster/hosts/$edge_hostname/host_components/OPENTSDB_PROXY"
-sleep 30s
-# install now & wait for the installation to complete
-install_id=$(curl -u $user:$password -H "X-Requested-By:ambari" -X PUT -d '{"HostRoles": {"state": "INSTALLED"}}' "http://headnodehost:8080/api/v1/clusters/$cluster/hosts/$edge_hostname/host_components/OPENTSDB_PROXY" | jq -r '.Requests.id')
-echo "$(date +%T) Install request id is: $install_id"
-percent_complete=0
-while [ $percent_complete -lt 100 ]; do
-    complete=$(curl -u $user:$password -H "X-Requested-By:ambari" "http://headnodehost:8080/api/v1/clusters/$cluster/requests/$install_id" | jq -r '.Requests.progress_percent')
-    percent_complete=$(printf "%.0f" $complete)
-    echo "$(date +%T) Install completion percentage: $percent_complete"
-    sleep 3s
-done
-# Start the service component
-echo "$(date +%T) Starting the OpenTSDB proxy service"
-curl -u $user:$password -H "X-Requested-By:ambari" -X PUT -d '{"HostRoles": {"state": "STARTED"}}' "http://headnodehost:8080/api/v1/clusters/$cluster/hosts/$edge_hostname/host_components/OPENTSDB_PROXY"
+
+wget "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/v0.3/deployment/finalize-external-proxy.sh" -O /tmp/finalize-external-proxy.sh
+chmod 744 /tmp/finalize-external-proxy.sh
+mkdir /var/log/opentsdb
+echo "$(date +%T) Logging background activity to /var/log/opentsdb/finalize-external-proxy.out & /var/log/opentsdb/finalize-external-proxy.err"
+nohup /tmp/finalize-external-proxy.sh $user $password $cluster $edge_hostname >/var/log/opentsdb/finalize-external-proxy.out 2>/var/log/opentsdb/finalize-external-proxy.err &
 echo "$(date +%T) Completed installation of OpenTSDB proxy service"

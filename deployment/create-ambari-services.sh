@@ -6,7 +6,7 @@ user=$1
 password=$2
 cluster=$3
 is_active_headnode=$4
-proxy_domain_suffix=$5
+tsd_listen_port=$5
 
 # Given that this script is running detached, we need to wait for a bit before restarting Ambari. Rrestarting during the
 # execution of our parent script causes the Ambari task to fail, thus failing the ARM deployment.
@@ -31,13 +31,16 @@ if [[ $is_active_headnode ]]; then
     curl -u $user:$password -H "X-Requested-By:ambari" -X POST "http://headnodehost:8080/api/v1/clusters/$cluster/services/OPENTSDB/components/OPENTSDB_TSD"
     curl -u $user:$password -H "X-Requested-By:ambari" -X POST "http://headnodehost:8080/api/v1/clusters/$cluster/services/OPENTSDB/components/OPENTSDB_PROXY"
     config_tag=INITIAL
+    if [ -z "$tsd_listen_port" ]; then
+        tsd_listen_port=4242
+    fi
     curl -u $user:$password -H "X-Requested-By:ambari" -X POST -d '{"type": "opentsdb-site", "tag": "'$config_tag'", "properties" : {
+            "tsd.network.port" : "'$tsd_listen_port'",
             "tsd.core.auto_create_metrics" : "true",
             "tsd.http.cachedir" : "/tmp/opentsdb",
             "tsd.http.staticroot" : "/usr/share/opentsdb/static/",
             "tsd.network.async_io" : "true",
             "tsd.network.keep_alive" : "true",
-            "tsd.network.port" : "4242",
             "tsd.network.reuse_address" : "true",
             "tsd.network.tcp_no_delay" : "true",
             "tsd.storage.enable_compaction" : "true",

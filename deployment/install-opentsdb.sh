@@ -3,6 +3,7 @@
 user=$1
 password=$2
 proxy_domain_suffix=$3
+tsd_listen_port=$4
 
 echo "$(date +%T) Starting custom action script for provisioning OpenTSDB as an Ambari service"
 apt-get install jq
@@ -74,7 +75,7 @@ wget "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/v0.3/deployment/cr
 chmod 744 /tmp/create-opentsdb-ambari-services.sh
 mkdir /var/log/opentsdb
 echo "$(date +%T) Logging background activity to /var/log/opentsdb/create-ambari-services.out & /var/log/opentsdb/create-ambari-services.err"
-nohup /tmp/create-opentsdb-ambari-services.sh $user $password $cluster $is_active_headnode $proxy_domain_suffix >/var/log/opentsdb/create-ambari-services.out 2>/var/log/opentsdb/create-ambari-services.err &
+nohup /tmp/create-opentsdb-ambari-services.sh $user $password $cluster $is_active_headnode $tsd_listen_port >/var/log/opentsdb/create-ambari-services.out 2>/var/log/opentsdb/create-ambari-services.err &
 echo "$(date +%T) OpenTSDB has been installed and TSD components have been deployed to all HBase region servers"
 
 
