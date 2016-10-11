@@ -13,18 +13,23 @@ tsd_listen_port=$5
 echo "$(date +%T) Pausing to allow remainder of HDInsight provision to complete"
 sleep 180s
 
+# Determine if AMS collector is running on this node (not necessarily the active headnode)
+ams_collector_host=$(curl -u $user:$password "http://headnodehost:8080/api/v1/clusters/$cluster/services/AMBARI_METRICS/components/METRICS_COLLECTOR?fields=host_components" | jq -r '.host_components[0].HostRoles.host_name')
+
 # Restart Ambari to cause our new service artifacts to be registered
 echo "$(date +%T) Restarting Ambari to register OpenTSDB service"
 service ambari-server restart
+
+if [[ $(hostname -f) == $ams_collector_host ]]; then
+    echo "$(date +%T) Restarting AMS to make new whitelist metrics effective"
+    su - ams -c'/usr/sbin/ambari-metrics-collector --config /etc/ambari-metrics-collector/conf/ restart'
+fi
 
 # We only need the service registration to proceed once - do it on the active headnode
 if [[ $is_active_headnode ]]; then
     echo "$(date +%T) Proceeding with registration & installation of OpenTSDB service + components on active head node"
     # We have to wait for it to come back up properly 
     sleep 60s
-
-    echo "$(date +%T) Restarting AMS to make new whitelist metrics effective"
-    su - ams -c'/usr/sbin/ambari-metrics-collector --config /etc/ambari-metrics-collector/conf/ restart'
 
     echo "$(date +%T) Registering OpenTSDB service with Ambari"
     curl -u $user:$password -H "X-Requested-By:ambari" -X POST -d '{"ServiceInfo":{"service_name":"OPENTSDB"}}' "http://headnodehost:8080/api/v1/clusters/$cluster/services"

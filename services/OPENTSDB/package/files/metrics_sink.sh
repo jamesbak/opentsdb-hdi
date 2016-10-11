@@ -1,6 +1,7 @@
 #!/bin/bash
 
 tsd_port=${1:-4242}
+ams_collector_host=${2:-'headnodehost'}
 
 curl http://localhost:$tsd_port/api/stats |
     jq --arg fqdn_host $(hostname -f) 'map(select(. as $metric |
@@ -45,5 +46,5 @@ curl http://localhost:$tsd_port/api/stats |
             }
         ]
     }' |
-    curl -X POST -H "Content-Type: application/json" http://headnodehost:6188/ws/v1/timeline/metrics -d @- 
+    curl -X POST -H "Content-Type: application/json" http://$ams_collector_host:6188/ws/v1/timeline/metrics -d @- 
 
