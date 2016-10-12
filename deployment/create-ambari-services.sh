@@ -19,7 +19,7 @@ ams_collector_host=$(curl -u $user:$password "http://headnodehost:8080/api/v1/cl
 
 # Restart Ambari to cause our new service artifacts to be registered
 echo "$(date +%T) Restarting Ambari to register OpenTSDB service"
-service ambari-server restart
+#service ambari-server restart
 
 if [[ $(hostname -f) == $ams_collector_host ]]; then
     echo "$(date +%T) Restarting AMS to make new whitelist metrics effective"
