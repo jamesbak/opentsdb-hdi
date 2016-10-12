@@ -55,7 +55,6 @@ class OpenTSDB(Script):
     Logger.info("OpenTSDB - Service is running.")
     # Install metrics sink (cron job hitting the tsd's stats API)
     Logger.info("Installing CRON job to gather metrics")
-    tsd_port = params.tsd_port
     File("/etc/cron.d/optsdb-metrics",
          content = format("* * * * * root /etc/opentsdb/metrics_sink.sh {tsd_port} {ams_collector_host} >> /var/log/opentsdb/optsdb-metrics.log 2>&1\n"))
     Logger.info("CRON job registered to gather metrics")
