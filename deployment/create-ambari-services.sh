@@ -23,7 +23,7 @@ service ambari-server restart
 
 if [[ $(hostname -f) == $ams_collector_host ]]; then
     echo "$(date +%T) Restarting AMS to make new whitelist metrics effective"
-    su - ams -c'/usr/sbin/ambari-metrics-collector --config /etc/ambari-metrics-collector/conf/ restart'
+    #su - ams -c'/usr/sbin/ambari-metrics-collector --config /etc/ambari-metrics-collector/conf/ restart'
 fi
 
 # We only need the service registration to proceed once - do it on the active headnode
