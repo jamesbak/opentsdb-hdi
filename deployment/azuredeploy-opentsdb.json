@@ -163,7 +163,7 @@
                 {
                   "name": "install-opentsdb",
                   "uri": "https://raw.githubusercontent.com/jamesbak/opentsdb-hdi/v0.3/deployment/install-opentsdb.sh",
-                  "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'), ' tsd ', parameters('tsdPortNumber'))]",
+                  "parameters": "[concat(parameters('clusterLoginUserName'), ' ', parameters('clusterLoginPassword'), ' ', parameters('tsdPortNumber'), ' tsd', ' 1')]",
                   "isHeadNode": true
                 }
               ]
