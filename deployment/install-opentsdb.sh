@@ -16,7 +16,7 @@ stack_version=$(curl -u $user:$password http://headnodehost:8080/api/v1/clusters
 echo "$(date +%T) Cluster: $cluster, Stack: $stack_name-$stack_version" 
 
 cd /var/lib/ambari-server/resources/stacks/$stack_name/$stack_version/services
-wget "https://github.com/jamesbak/opentsdb-hdi/files/523287/OPENTSDB.tar.gz" -O /tmp/OPENTSDB.tar.gz
+wget "https://github.com/jamesbak/opentsdb-hdi/files/530645/OPENTSDB.tar.gz" -O /tmp/OPENTSDB.tar.gz
 tar -xvf /tmp/OPENTSDB.tar.gz
 chmod -R 644 OPENTSDB
 sed -i "s/\(agent.auto.cache.update=\).*/\1true/" /etc/ambari-server/conf/ambari.properties
